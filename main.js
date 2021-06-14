@@ -48,7 +48,7 @@ const logs = {
         '[playerKick] не думал о бое, потому расстроенный [playerDefence] отпрыгнул от удара кулаком куда обычно не бьют.',
         '[playerKick] обманулся и жестокий [playerDefence] блокировал удар стопой в солнечное сплетение.',
     ],
-    draw: 'Ничья - это тоже победа!'
+    draw: 'Ничья - это тоже победа!',
 };
 
 const player1 = {
@@ -203,31 +203,31 @@ function displayCurrentTime() {
 }
 
 function generateLogs(type, player1, player2, damage) {
+    let el = '';
+    let text = '';
     switch (type) {
         case 'start':
-            const startText = logs[type].replace('[player1]', player1.name).replace('[player2]', player2.name).replace('[time]', displayCurrentTime());
-            const startEl = `<p>${startText}</p>`;
-            $chat.insertAdjacentHTML('afterbegin', startEl);
+            text = logs[type].replace('[player1]', player1.name).replace('[player2]', player2.name).replace('[time]', displayCurrentTime());
+            el = `<p>${text}</p>`;
             break;
         case 'hit':
-            const hitText = logs[type][getRandom(logs[type].length) - 1].replace('[playerKick]', player1.name).replace('[playerDefence]', player2.name);
-            const hitEl = `<p style="color: #F00;">${displayCurrentTime()} - ${hitText} -${damage} [${player2.hp}/100]</p>`;
-            $chat.insertAdjacentHTML('afterbegin', hitEl);
+            text = logs[type][getRandom(logs[type].length) - 1].replace('[playerKick]', player1.name).replace('[playerDefence]', player2.name);
+            el = `<p class="hitColor">${displayCurrentTime()} - ${text} -${damage} [${player2.hp}/100]</p>`;
             break;
         case 'defence':
-            const defenceText = logs[type][getRandom(logs[type].length) - 1].replace('[playerKick]', player1.name).replace('[playerDefence]', player2.name);
-            const defenceEl = `<p style="color: #4F4;">${displayCurrentTime()} - ${defenceText}</p>`;
-            $chat.insertAdjacentHTML('afterbegin', defenceEl);
+            text = logs[type][getRandom(logs[type].length) - 1].replace('[playerKick]', player1.name).replace('[playerDefence]', player2.name);
+            el = `<p class="defenceColor">${displayCurrentTime()} - ${text}</p>`;
             break;
         case 'end':
-            const endEl = logs[type][getRandom(logs[type].length) - 1].replace('[playerWins]', player1.name).replace('[playerLose]', player2.name);
-            $chat.insertAdjacentHTML('afterbegin', endEl);
+            el = logs[type][getRandom(logs[type].length) - 1].replace('[playerWins]', player1.name).replace('[playerLose]', player2.name);
             break;
         case 'draw':
-            const drawEl = logs[type];
-            $chat.insertAdjacentHTML('afterbegin', drawEl);
+            el = logs[type];
             break;
+        default:
+            el = 'WTF is going on?'
     }
+    $chat.insertAdjacentHTML('afterbegin', el);
 }
 
 generateLogs('start', player2, player1);

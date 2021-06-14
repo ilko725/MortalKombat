@@ -218,6 +218,14 @@ body {
     width: 100%;
 }
 
+.hitColor {
+    color: #F00
+}
+
+.defenceColor {
+    color: #4F4
+}
+
 .button {
     display: block;
     position: relative;
