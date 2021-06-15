@@ -22,17 +22,17 @@ export const player2 = {
     renderHP,
 };
 
-export function createPlayer(playerObject) {
-    const $player = createElement('div', `player${playerObject.player}`);
+export function createPlayer({ player, hp, name, img }) {
+    const $player = createElement('div', `player${player}`);
     const $progressbar = createElement('div', 'progressbar');
     const $life = createElement('div', 'life');
     const $name = createElement('div', 'name');
     const $character = createElement('div', 'character');
     const $img = createElement('img');
 
-    $life.style.width = `${playerObject.hp}%`;
-    $name.innerText = playerObject.name;
-    $img.src = playerObject.img;
+    $life.style.width = `${hp}%`;
+    $name.innerText = name;
+    $img.src = img;
 
     $progressbar.appendChild($life);
     $progressbar.appendChild($name);
