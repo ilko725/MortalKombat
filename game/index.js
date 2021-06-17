@@ -21,14 +21,14 @@ class Game {
             weapon: ['knife', 'plate'],
             rootSelector: 'arenas',
         });
-        ///////controls 
         this.$formFight = document.querySelector('.control');
         this.$arenas = document.querySelector('.arenas');
         this.$fightButton = document.querySelector('.control .button');
-        ///////LOGS 
         this.$chat = document.querySelector('.chat');
-        console.log(this.$formFight)
     };
+
+    ///////////////////////////////  CONTROLS
+
     createReloadButton = () => {
         const $reloadWrap = createElement('div', 'reloadWrap');
         const $reloadButton = createElement('button', 'button');
@@ -55,22 +55,22 @@ class Game {
     buttonDisabler = () => {
         if (this.player1.hp === 0 || this.player2.hp === 0) {
             this.$fightButton.disabled = true;
-            createReloadButton();
+            this.createReloadButton();
         }
     };
 
     winnerChecker = (player1, player2) => {
         if (player1.hp === 0 && player2.hp > player1.hp) {
-            $arenas.appendChild(showResults(player2.name));
-            generateLogs('end', player2, player1);
+            this.$arenas.appendChild(this.showResults(player2.name));
+            this.generateLogs('end', player2, player1);
         } else if (player2.hp === 0 && player1.hp > player2.hp) {
-            $arenas.appendChild(showResults(player1.name));
-            generateLogs('end', player1, player2);
+            this.$arenas.appendChild(this.showResults(player1.name));
+            this.generateLogs('end', player1, player2);
         } else if (player1.hp === 0 && player2.hp === 0) {
-            $arenas.appendChild(showResults());
-            generateLogs('draw');
+            this.$arenas.appendChild(this.showResults());
+            this.generateLogs('draw');
         };
-        buttonDisabler();
+        this.buttonDisabler();
     }
 
 
@@ -142,42 +142,39 @@ class Game {
         this.$chat.insertAdjacentHTML('afterbegin', el);
     }
 
-    ///////////////////////////////  LOGS END
+    ///////////////////////////////  START
 
     start = () => {
         this.player1.createPlayer();
         this.player2.createPlayer();
-        const generateLogs = this.generateLogs;
-        const playerAttack = this.playerAttack;
-        const enemyAttack = this.enemyAttack;
-        console.log(this.player1.elHP());
+        console.log(this.$formFight);
 
-        this.$formFight.addEventListener('submit', function(e) {
+        this.$formFight.addEventListener('submit', (e) => {
             e.preventDefault();
 
-            const { hit: hitEnemy, defence: defenceEnemy, value: valueEnemy } = enemyAttack();
-            const { hit, defence, value } = playerAttack();
+            const { hit: hitEnemy, defence: defenceEnemy, value: valueEnemy } = this.enemyAttack();
+            const { hit, defence, value } = this.playerAttack();
 
             if (hitEnemy !== defence) {
                 this.player1.changeHP(valueEnemy);
-                generateLogs('hit', this.player2, this.player1, valueEnemy);
+                this.generateLogs('hit', this.player2, this.player1, valueEnemy);
             } else {
-                generateLogs('defence', this.player2, this.player1);
+                this.generateLogs('defence', this.player2, this.player1);
             }
 
             if (hit !== defenceEnemy) {
                 this.player2.changeHP(value);
-                generateLogs('hit', this.player1, this.player2, value);
+                this.generateLogs('hit', this.player1, this.player2, value);
             } else {
-                generateLogs('defence', this.player1, this.player2);
+                this.generateLogs('defence', this.player1, this.player2);
             }
             console.log(this.player1);
             this.player1.renderHP();
             this.player2.renderHP();
-            winnerChecker(this.player1, this.player2);
+            this.winnerChecker(this.player1, this.player2);
         })
 
-        generateLogs('start', this.player1, this.player2);
+        this.generateLogs('start', this.player1, this.player2);
     }
 };
 
