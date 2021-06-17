@@ -1,29 +1,53 @@
-import { player1, player2, createPlayer } from './players.js';
+import { winnerChecker, enemyAttack, playerAttack, $formFight } from './controls.js';
 import { generateLogs } from './logs.js';
-import { winnerChecker, enemyAttack, playerAttack, $formFight, $arenas } from './controls.js';
+import Player from './Player/index.js';
 
-$arenas.appendChild(createPlayer(player1));
-$arenas.appendChild(createPlayer(player2));
+import Game from './game/index.js';
+const game = new Game();
 
-generateLogs('start', player2, player1);
+game.start();
+
+
+
+
+
+
+
+export const player1 = new Player({
+    player: 1,
+    name: 'GRISHA',
+    hp: 100,
+    img: 'http://reactmarathon-api.herokuapp.com/assets/scorpion.gif',
+    weapon: ['fork', 'spoon'],
+    rootSelector: 'arenas',
+});
+
+export const player2 = new Player({
+    player: 2,
+    name: 'LENA',
+    hp: 100,
+    img: 'http://reactmarathon-api.herokuapp.com/assets/kitana.gif',
+    weapon: ['knife', 'plate'],
+    rootSelector: 'arenas',
+});
 
 $formFight.addEventListener('submit', function(e) {
     e.preventDefault();
 
-    const enemy = enemyAttack();
-    const player = playerAttack();
+    const { hit: hitEnemy, defence: defenceEnemy, value: valueEnemy } = enemyAttack();
+    const { hit, defence, value } = playerAttack();
 
 
-    if (enemy.hit !== player.defence) {
-        player1.changeHP(enemy.value);
-        generateLogs('hit', player2, player1, enemy.value);
+    if (hitEnemy !== defence) {
+        player1.changeHP(valueEnemy);
+        generateLogs('hit', player2, player1, valueEnemy);
     } else {
         generateLogs('defence', player2, player1);
     }
 
-    if (player.hit !== enemy.defence) {
-        player2.changeHP(player.value);
-        generateLogs('hit', player1, player2, player.value);
+    if (hit !== defenceEnemy) {
+        player2.changeHP(value);
+        generateLogs('hit', player1, player2, value);
     } else {
         generateLogs('defence', player1, player2);
     }
@@ -31,3 +55,12 @@ $formFight.addEventListener('submit', function(e) {
     player2.renderHP();
     winnerChecker(player1, player2);
 })
+
+function init() {
+    player1.createPlayer();
+    player2.createPlayer();
+    console.log(player1)
+    generateLogs('start', player1, player2);
+}
+
+init();

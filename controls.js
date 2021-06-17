@@ -1,18 +1,13 @@
-import { getRandom, createElement } from './utils.js';
-import { player1, player2 } from './players.js';
-import { generateLogs } from './logs.js'
+import { getRandom, createElement } from './utils/index.js';
+import { player1, player2 } from './main.js';
+import { generateLogs } from './logs.js';
+import { HIT, ATTACK } from './constants/index.js';
+
 
 
 const $fightButton = document.querySelector('.control .button');
 export const $formFight = document.querySelector('.control');
 export const $arenas = document.querySelector('.arenas');
-
-const HIT = {
-    head: 30,
-    body: 25,
-    foot: 20,
-}
-const ATTACK = ['head', 'body', 'foot'];
 
 function createReloadButton() {
     const $reloadWrap = createElement('div', 'reloadWrap');
@@ -38,6 +33,13 @@ function showResults(name) {
     return $resultTitle;
 }
 
+function buttonDisabler() {
+    if (player1.hp === 0 || player2.hp === 0) {
+        $fightButton.disabled = true;
+        createReloadButton();
+    }
+};
+
 export function winnerChecker(player1, player2) {
     if (player1.hp === 0 && player2.hp > player1.hp) {
         $arenas.appendChild(showResults(player2.name));
@@ -52,12 +54,6 @@ export function winnerChecker(player1, player2) {
     buttonDisabler();
 }
 
-function buttonDisabler() {
-    if (player1.hp === 0 || player2.hp === 0) {
-        $fightButton.disabled = true;
-        createReloadButton();
-    }
-};
 
 export function enemyAttack() {
     const hit = ATTACK[getRandom(3) - 1];
