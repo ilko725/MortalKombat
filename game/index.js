@@ -27,6 +27,11 @@ class Game {
         this.$chat = document.querySelector('.chat');
     };
 
+    getPlayers = async() => {
+        const body = fetch('https://reactmarathon-api.herokuapp.com/api/mk/players').then(res => res.json());
+        return body;
+    };
+
     ///////////////////////////////  CONTROLS
 
     createReloadButton = () => {
@@ -35,7 +40,7 @@ class Game {
         $reloadButton.innerText = 'Restart';
 
         $reloadButton.addEventListener('click', function() {
-            window.location.reload();
+            window.location.pathname = 'index.html';
         });
 
         $reloadWrap.appendChild($reloadButton);
@@ -52,13 +57,6 @@ class Game {
         return $resultTitle;
     }
 
-    buttonDisabler = () => {
-        if (this.player1.hp === 0 || this.player2.hp === 0) {
-            this.$fightButton.disabled = true;
-            this.createReloadButton();
-        }
-    };
-
     winnerChecker = (player1, player2) => {
         if (player1.hp === 0 && player2.hp > player1.hp) {
             this.$arenas.appendChild(this.showResults(player2.name));
@@ -70,7 +68,10 @@ class Game {
             this.$arenas.appendChild(this.showResults());
             this.generateLogs('draw');
         };
-        this.buttonDisabler();
+        if (player1.hp === 0 || player2.hp === 0) {
+            this.$fightButton.disabled = true;
+            this.createReloadButton();
+        }
     }
 
 
@@ -84,6 +85,23 @@ class Game {
             defence,
         };
     };
+
+    // justAttack = async() => {
+    //     const hit = 'body';
+    //     const defence = 'foot';
+    //     const fight = fetch('http://reactmarathon-api.herokuapp.com/api/mk/player/fight', {
+    //         method: 'POST',
+    //         body: JSON.stringify({
+    //             hit,
+    //             defence,
+    //         })
+    //     });
+    //     fight.then(response => {
+    //         console.log('fuck');
+    //         console.log(response);
+    //     })
+    //     return fight;
+    // };
 
     playerAttack = () => {
         const attack = {};
@@ -116,8 +134,7 @@ class Game {
             case 'draw':
                 return LOGS[type];
             default:
-                'Nu yo mayo!';
-                break;
+                return;
         }
     }
 
@@ -135,8 +152,7 @@ class Game {
             case 'draw':
                 break;
             default:
-                text = 'WTF is going on?'
-                break;
+                return;
         }
         const el = `<p>${text}</p>`;
         this.$chat.insertAdjacentHTML('afterbegin', el);
@@ -144,10 +160,25 @@ class Game {
 
     ///////////////////////////////  START
 
-    start = () => {
-        this.player1.createPlayer();
-        this.player2.createPlayer();
-        console.log(this.$formFight);
+    start = async() => {
+        const players = await this.getPlayers();
+        const p1 = JSON.parse(localStorage.getItem('player1'));
+        const p2 = players[getRandom(players.length) - 1];
+        const player1 = new Player({
+            ...p1,
+            player: 1,
+            rootSelector: 'arenas',
+        });
+        const player2 = new Player({
+            ...p2,
+            player: 2,
+            rootSelector: 'arenas',
+        });
+        // const justAttack = this.justAttack();
+        // console.log(justAttack);
+        player1.createPlayer();
+        player2.createPlayer();
+        JSON.parse(localStorage.getItem('player1'));
 
         this.$formFight.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -156,25 +187,24 @@ class Game {
             const { hit, defence, value } = this.playerAttack();
 
             if (hitEnemy !== defence) {
-                this.player1.changeHP(valueEnemy);
-                this.generateLogs('hit', this.player2, this.player1, valueEnemy);
+                player1.changeHP(valueEnemy);
+                this.generateLogs('hit', player2, player1, valueEnemy);
             } else {
-                this.generateLogs('defence', this.player2, this.player1);
+                this.generateLogs('defence', player2, player1);
             }
 
             if (hit !== defenceEnemy) {
-                this.player2.changeHP(value);
-                this.generateLogs('hit', this.player1, this.player2, value);
+                player2.changeHP(value);
+                this.generateLogs('hit', player1, player2, value);
             } else {
-                this.generateLogs('defence', this.player1, this.player2);
+                this.generateLogs('defence', player1, player2);
             }
-            console.log(this.player1);
-            this.player1.renderHP();
-            this.player2.renderHP();
-            this.winnerChecker(this.player1, this.player2);
+            player1.renderHP();
+            player2.renderHP();
+            this.winnerChecker(player1, player2);
         })
 
-        this.generateLogs('start', this.player1, this.player2);
+        this.generateLogs('start', player1, player2);
     }
 };
 
